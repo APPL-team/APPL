@@ -49,6 +49,7 @@ settings:
   tracing:
     enabled: false # default to not trace the calls
     path_format: './dumps/traces/{basename}_{time:YYYY_MM_DD__HH_mm_ss}'
+    use_global_gen_cnt: false # whether to use the global generation count, enable when using within streamlit
     # The path to the trace file, ext will be added automatically
     patch_threading: true # whether to patch `threading.Thread`
     strict_match: true # when saving and loading cache, whether need to match the generation id

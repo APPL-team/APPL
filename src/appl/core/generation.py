@@ -95,11 +95,14 @@ class Generation(Generic[M], Promptable):
         # name needs to be unique and ordered, so it has to be generated in the main thread
         gen_name_prefix = get_gen_name_prefix()
         # take the value before increment
-        self._cnt = inc_thread_local(f"{gen_name_prefix}_gen_cnt") - 1
-        if gen_name_prefix is None:
-            self._id = f"@gen_{self._cnt}"
+        if global_vars.configs.settings.tracing.use_global_gen_cnt:
+            self._cnt = global_vars.inc("gen_cnt", key=gen_name_prefix or "") - 1
+            self._id = f"@gen_global_{self._cnt}"
         else:
-            self._id = f"@{gen_name_prefix}_gen_{self._cnt}"
+            self._cnt = inc_thread_local(f"{gen_name_prefix or ''}_gen_cnt") - 1
+            self._id = f"@gen_{self._cnt}"
+        if gen_name_prefix is not None:
+            self._id = f"@{gen_name_prefix}_{self._id[1:]}"
 
         self._server = server
         self._model_name = server.model_name

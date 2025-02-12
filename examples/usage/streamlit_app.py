@@ -3,8 +3,8 @@ import streamlit as st
 import appl
 from appl import AIMessage, Conversation, UserMessage, gen, ppl
 
-appl.init(settings={"tracing": {"enabled": False}})
-# TODO: fix the incompatibility between streamlit and tracing, temporarily disable tracing
+appl.init(settings={"tracing": {"use_global_gen_cnt": True}})
+# use global gen cnt for tracing when using streamlit
 
 with st.sidebar:
     model_name = st.selectbox(

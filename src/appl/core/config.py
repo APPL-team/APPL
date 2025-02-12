@@ -4,7 +4,7 @@ from typing import Annotated, Any, Dict, List, Optional, Union
 import addict
 import yaml
 from loguru import logger
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .io import get_ext, load_file
 
@@ -139,6 +139,13 @@ class TracingSettings(BaseAPPLConfigs):
     path_format: str = Field(
         default="./dumps/traces/{basename}_{time:YYYY_MM_DD__HH_mm_ss}"
     )
+    use_global_gen_cnt: bool = Field(
+        default=False,
+        description=(
+            "Use global generation count, default to thread-level, "
+            "enable when using within streamlit"
+        ),
+    )
     patch_threading: bool = Field(
         default=True, description="Whether to patch threading.Thread"
     )
@@ -245,6 +252,24 @@ class APPLConfigs(BaseAPPLConfigs):
             "arguments"
         ),
     )
+
+    @field_validator("servers", mode="after")
+    @classmethod
+    def warn_api_key(cls, value: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        """Warn if the api_key is set in the config file."""
+        if value is not None:
+            for name, server in value.items():
+                if api_key := server.get("api_key"):
+                    # if api_key.startswith("sk-"): # or only detect api keys starts with "sk-"?
+                    if not api_key.startswith("os.environ"):
+                        logger.warning(
+                            f"In server {name}, secret api key should not be "
+                            "configured directly in the config file. Please use "
+                            "`os.environ/API_KEY_NAME` instead and set up the "
+                            "environment variable `API_KEY_NAME`, for example, "
+                            "in your `.env`, `.bashrc` or `.zshrc` file."
+                        )
+        return value
 
 
 # ===== END CONFIGS =====

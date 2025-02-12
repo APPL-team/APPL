@@ -24,7 +24,7 @@ class GlobalVars:
     now: pendulum.DateTime
     lock: threading.Lock
     # statistics
-    gen_cnt: int
+    gen_cnt: Dict[str, int]
     num_requests: Dict[str, int]
     api_cost: Dict[str, float]
     func_run_cnt: Dict[str, int]
@@ -42,7 +42,7 @@ class GlobalVars:
         """Initialize the global variables."""
         self.now = pendulum.instance(datetime.datetime.now())
         self.lock = threading.Lock()
-        self.gen_cnt = 0
+        self.gen_cnt = defaultdict(int)
         self.num_requests = defaultdict(int)
         self.api_cost = defaultdict(float)
         self.func_run_cnt = defaultdict(int)

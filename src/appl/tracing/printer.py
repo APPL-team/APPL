@@ -347,7 +347,7 @@ class TraceLangfusePrinter(TracePrinterBase):
         user_id = metadata.get("user_id", None)
         if user_id is None:
             git_info: Dict[str, Any] = metadata.get("git_info", {})
-            user_id = git_info.get("git_user_email", "unknown")
+            user_id = git_info.get("user", "unknown")
 
         session_id = metadata.get("start_time", str(uuid.uuid4()))
         if "exec_file_basename" in metadata:
