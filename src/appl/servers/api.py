@@ -102,6 +102,7 @@ def chat_completion(**kwargs: Any) -> CompletionResponse:
                     "Using cached complete response for a streaming generation."
                 )
         else:
+            # TODO: only add successful response to cache
             add_to_cache(kwargs, raw_response)  # type: ignore
         if display_settings.llm_raw_response:
             logger.info(f"Completion [{gen_id}] response: {response}")

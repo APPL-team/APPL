@@ -417,6 +417,7 @@ def gen(
     stream: Optional[bool] = None,
     response_format: Optional[Union[dict, str, Type[M]]] = None,
     response_model: Optional[Type[M]] = None,
+    max_retries: Optional[int] = None,
     max_relay_rounds: int = 0,
     mock_response: Optional[Union[CompletionResponse, str]] = None,
     messages_process_func: Optional[Callable[[Conversation], Conversation]] = None,
@@ -445,6 +446,8 @@ def gen(
             instructor's argument specifies the response format as a Pydantic model.
             use `instructor_patch_mode` to specify the mode for patching the raw completion.
             Recommended to use `response_format` instead. Defaults to None.
+        max_retries (int, optional):
+            the maximum number of retries for the generation. Defaults to None (no retries).
         max_relay_rounds (int, optional):
             the maximum number of relay rounds to continue the unfinished text generation. Defaults to 0.
         mock_response (Union[CompletionResponse, str], optional):
@@ -549,6 +552,8 @@ def gen(
         max_relay_rounds=max_relay_rounds,
         mock_response=mock_response,
         _ctx=_ctx,
+        # extra args to pass to the generation
+        max_retries=max_retries,
         **kwargs,
     )
 

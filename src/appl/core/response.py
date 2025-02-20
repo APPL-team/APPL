@@ -364,7 +364,12 @@ class CompletionResponse(BaseModel):
             delta: Union[Delta, ChoiceDelta] = chunk.choices[0].delta  # type: ignore
 
             if delta is not None and isinstance(delta, Delta):
-                if provider_specific_fields := delta.get(
+                if reasoning_content := delta.get("reasoning_content", None):
+                    assert (
+                        delta.content is None
+                    ), "Reasoning content should not be provided when content is also provided"
+                    yield ReasoningContent(content=reasoning_content)
+                elif provider_specific_fields := delta.get(
                     "provider_specific_fields", None
                 ):
                     if reasoning_content := provider_specific_fields.get(
@@ -413,7 +418,9 @@ class CompletionResponse(BaseModel):
             elif message.content is not None:
                 self.message = message.content
                 if isinstance(message, LiteLLMMessage):
-                    if provider_specific_fields := message.get(
+                    if reasoning_content := message.get("reasoning_content", None):
+                        self.reasoning_content = reasoning_content
+                    elif provider_specific_fields := message.get(
                         "provider_specific_fields", None
                     ):
                         self.reasoning_content = provider_specific_fields.get(

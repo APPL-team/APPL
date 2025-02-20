@@ -45,7 +45,8 @@ settings:
     time_to_live: 43200 # Time-to-live in minutes (30 days)
     cleanup_interval: 1440 # Cleanup interval in minutes (1 day)
     allow_temp_greater_than_0: false # Whether to cache the generation results with temperature to be greater than 0
-
+    irrelevant_args: ["max_retries", "num_retries"] # Ignore the args that are not relevant to the response results when caching
+  
   tracing:
     enabled: false # default to not trace the calls
     path_format: './dumps/traces/{basename}_{time:YYYY_MM_DD__HH_mm_ss}'

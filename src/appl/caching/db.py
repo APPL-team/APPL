@@ -201,6 +201,14 @@ def _serialize_args(args: Dict[str, Any]) -> str:
     return json.dumps(args)
 
 
+def _remove_irrelevant_args(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ignore the args that are not relevant to the response results."""
+    irrelevant_args = global_vars.configs.settings.caching.irrelevant_args
+    if irrelevant_args is None:
+        return args
+    return {k: v for k, v in args.items() if k not in irrelevant_args}
+
+
 def find_in_cache(
     args: Dict[str, Any], cache: Optional[DBCacheBase] = None
 ) -> Optional[ModelResponse]:
@@ -216,11 +224,13 @@ def find_in_cache(
     cache = cache or global_vars.llm_cache
     if cache is None:
         return None
+
     if (
         args.get("temperature", 1.0) > 0.0
         and not global_vars.configs.settings.caching.allow_temp_greater_than_0
     ):
         return None
+    args = _remove_irrelevant_args(args)
     # only cache the completions with temperature == 0
     value = cache.find(_serialize_args(args))
     if value is None:
@@ -234,13 +244,15 @@ def add_to_cache(
     """Add a value to the LLM cache."""
     cache = cache or global_vars.llm_cache
     if cache is None:
-        logger.warning("No cache to add to")
+        if global_vars.configs.settings.caching.enabled:
+            logger.warning("No cache to add to")
         return
     if (
         args.get("temperature", 1.0) > 0.0
         and not global_vars.configs.settings.caching.allow_temp_greater_than_0
     ):
         return
+    args = _remove_irrelevant_args(args)
     args_str = _serialize_args(args)
     value_dict = pydantic_to_dict(value)
     logger.info(f"Adding to cache, args: {args_str}, value: {value_dict}")

@@ -130,6 +130,13 @@ class CachingSettings(BaseAPPLConfigs):
     allow_temp_greater_than_0: bool = Field(
         default=False, description="Allow caching with temperature > 0"
     )
+    irrelevant_args: Optional[List[str]] = Field(
+        default=["max_retries", "num_retries"],
+        description=(
+            "Ignore the args that are not relevant to the response results when "
+            "caching the LLM calls"
+        ),
+    )
 
 
 class TracingSettings(BaseAPPLConfigs):

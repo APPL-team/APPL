@@ -436,7 +436,11 @@ class TraceLangfusePrinter(TracePrinterBase):
                         message = outputs.choices[0].message  # type: ignore
                         outputs = message.content or ""
                         # Add reasoning content if exists
-                        if provider_specific_fields := message.get(
+                        if reasoning_content := message.get("reasoning_content", None):
+                            outputs = (
+                                f"```reasoning\n{reasoning_content}\n```\n" + outputs
+                            )
+                        elif provider_specific_fields := message.get(
                             "provider_specific_fields", None
                         ):
                             if reasoning_content := provider_specific_fields.get(
